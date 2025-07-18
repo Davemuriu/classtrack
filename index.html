@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ClassTrack – Student Attendance</title>
+  <link rel="stylesheet" href="style.css"/>
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+  <header>
+    <h1>ClassTrack</h1>
+    <p>Student Attendance & Participation Tracker</p>
+  </header>
+
+  <main>
+    <section class="controls">
+      <button id="add-student-btn" class="btn">Add Student</button>
+      <button id="take-attendance-btn" class="btn">Take Attendance</button>
+      <button id="view-sessions-btn" class="btn">View Sessions</button>
+      <button id="export-btn" class="btn">Export to Excel</button>
+    </section>
+
+    <section class="dashboard">
+      <div class="card">
+        <h3>Total Students</h3>
+        <p id="total-students">0</p>
+      </div>
+      <div class="card">
+        <h3>Total Sessions</h3>
+        <p id="total-sessions">0</p>
+      </div>
+      <div class="card">
+        <h3>Avg Attendance</h3>
+        <p id="avg-attendance">0%</p>
+      </div>
+    </section>
+
+    <section class="student-section">
+      <h2>Student List</h2>
+      <div id="student-list" class="student-list"></div>
+    </section>
+  </main>
+
+  <!-- Add Student Modal -->
+  <div class="modal" id="student-modal">
+    <div class="modal-content">
+      <span id="close-student-modal" class="close">&times;</span>
+      <h2>Add New Student</h2>
+      <input type="text" id="student-name" placeholder="Student Name"/>
+      <input type="text" id="student-reg" placeholder="Registration Number"/>
+      <button id="save-student" class="btn">Save</button>
+    </div>
+  </div>
+
+  <!-- Take Attendance Modal -->
+  <div class="modal" id="attendance-modal">
+    <div class="modal-content">
+      <span id="close-attendance-modal" class="close">&times;</span>
+      <h2>Take Attendance</h2>
+      <input type="text" id="session-name" placeholder="Session Name"/>
+      <form id="attendance-form">
+        <div id="attendance-student-list" class="checkbox-list"></div>
+        <button type="submit" class="btn">Submit Attendance</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- View Sessions Modal -->
+  <div class="modal" id="sessions-modal">
+    <div class="modal-content">
+      <span id="close-sessions-modal" class="close">&times;</span>
+      <h2>Previous Sessions</h2>
+      <div id="sessions-list" class="sessions-list"></div>
+    </div>
+  </div>
+
+  <!-- Edit Session Modal -->
+  <div class="modal" id="edit-session-modal">
+    <div class="modal-content">
+      <span id="close-edit-session-modal" class="close">&times;</span>
+      <h2>Edit Session</h2>
+      <input type="hidden" id="edit-session-id"/>
+      <input type="text" id="edit-session-name" placeholder="Session Name"/>
+      <input type="date" id="edit-session-date"/>
+      <input type="time" id="edit-session-time"/>
+      <div id="edit-attendance-list" class="checkbox-list"></div>
+      <button id="update-session" class="btn">Update Session</button>
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>
