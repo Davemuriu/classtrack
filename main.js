@@ -1,5 +1,5 @@
-const STUDENTS_URL = 'http://localhost:3000/students';
-const SESSIONS_URL = 'http://localhost:3000/sessions';
+const STUDENTS_URL = 'https://classtrack.onrender.com/students';
+const SESSIONS_URL = 'https://classtrack.onrender.com/sessions';
 
 let students = [];
 let sessions = [];
