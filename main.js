@@ -1,3 +1,4 @@
+
 const STUDENTS_URL = 'https://classtrack.onrender.com/students';
 const SESSIONS_URL = 'https://classtrack.onrender.com/sessions';
 
@@ -14,7 +15,7 @@ function closeModal(id) {
 function updateStats() {
   document.getElementById("total-students").innerText = students.length;
   document.getElementById("total-sessions").innerText = sessions.length;
-  const totalPresent = sessions.reduce((sum, s) => sum + s.presentIds.length, 0);
+  const totalPresent = sessions.reduce((sum, s) => sum + (s.presentIds?.length || 0), 0);
   const totalPossible = sessions.length * students.length;
   const rate = totalPossible ? Math.round((totalPresent / totalPossible) * 100) : 0;
   document.getElementById("avg-attendance").innerText = rate + "%";
@@ -51,7 +52,8 @@ function renderSessions() {
   const container = document.getElementById("sessions-list");
   container.innerHTML = "";
   sessions.forEach(s => {
-    const presentNames = s.presentIds.map(id => {
+    const presentIds = Array.isArray(s.presentIds) ? s.presentIds : [];
+    const presentNames = presentIds.map(id => {
       const student = students.find(st => st.id === id);
       return student ? `${student.name} (${student.regNo})` : `[Unknown ID: ${id}]`;
     }).join(", ");
@@ -93,24 +95,14 @@ function setupEvents() {
   const studentForm = document.getElementById("student-form");
   const attendanceForm = document.getElementById("attendance-form");
 
-  // Input validation: real-time
   studentNameInput.addEventListener("input", () => {
-    if (!studentNameInput.value.trim()) {
-      studentNameInput.style.borderColor = "red";
-    } else {
-      studentNameInput.style.borderColor = "";
-    }
+    studentNameInput.style.borderColor = studentNameInput.value.trim() ? "" : "red";
   });
 
   studentRegInput.addEventListener("input", () => {
-    if (!studentRegInput.value.trim()) {
-      studentRegInput.style.borderColor = "red";
-    } else {
-      studentRegInput.style.borderColor = "";
-    }
+    studentRegInput.style.borderColor = studentRegInput.value.trim() ? "" : "red";
   });
 
-  // Submit student
   studentForm.onsubmit = e => {
     e.preventDefault();
     const name = studentNameInput.value.trim();
@@ -133,7 +125,6 @@ function setupEvents() {
       });
   };
 
-  // Delete student with confirm
   document.getElementById("student-list").addEventListener("click", e => {
     if (e.target.classList.contains("delete-student")) {
       const id = e.target.dataset.id;
@@ -148,7 +139,6 @@ function setupEvents() {
     }
   });
 
-  // Submit session
   attendanceForm.onsubmit = e => {
     e.preventDefault();
     const name = document.getElementById("session-name").value.trim();
@@ -176,7 +166,6 @@ function setupEvents() {
       });
   };
 
-  // Delete or Edit session
   document.getElementById("sessions-list").addEventListener("click", e => {
     const id = parseInt(e.target.dataset.id);
     if (!id) return;
@@ -196,13 +185,12 @@ function setupEvents() {
         document.getElementById("edit-session-name").value = session.name;
         document.getElementById("edit-session-date").value = session.date;
         document.getElementById("edit-session-time").value = session.time;
-        renderAttendanceList("edit-attendance-list", "edit-present", session.presentIds);
+        renderAttendanceList("edit-attendance-list", "edit-present", session.presentIds || []);
         openModal("edit-session-modal");
       }
     }
   });
 
-  // Update session
   document.getElementById("update-session").onclick = () => {
     const id = +document.getElementById("edit-session-id").value;
     const name = document.getElementById("edit-session-name").value.trim();
@@ -226,7 +214,6 @@ function setupEvents() {
     });
   };
 
-  // Modal triggers
   document.getElementById("add-student-btn").onclick = () => openModal("student-modal");
   document.getElementById("take-attendance-btn").onclick = () => openModal("attendance-modal");
   document.getElementById("view-sessions-btn").onclick = () => {
@@ -234,7 +221,6 @@ function setupEvents() {
     openModal("sessions-modal");
   };
 
-  // Modal closers
   document.getElementById("close-student-modal").onclick = () => closeModal("student-modal");
   document.getElementById("close-attendance-modal").onclick = () => closeModal("attendance-modal");
   document.getElementById("close-sessions-modal").onclick = () => closeModal("sessions-modal");
