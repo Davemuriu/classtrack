@@ -1,4 +1,3 @@
-
 const STUDENTS_URL = 'https://classtrack.onrender.com/students';
 const SESSIONS_URL = 'https://classtrack.onrender.com/sessions';
 
@@ -28,7 +27,7 @@ function renderStudentList() {
     const div = document.createElement("div");
     div.className = "student-card";
     div.innerHTML = `
-      <strong>${s.name}</strong> (${s.regNo})
+      <strong>${s.name}</strong> (${s.admissionNo})
       <button class="btn btn-sm btn-danger delete-student" data-id="${s.id}">X</button>`;
     container.appendChild(div);
   });
@@ -42,7 +41,7 @@ function renderAttendanceList(containerId, nameAttr, presentIds = []) {
     const label = document.createElement("label");
     label.innerHTML = `
       <input type="checkbox" name="${nameAttr}" value="${s.id}" ${checked}>
-      ${s.name} (${s.regNo})`;
+      ${s.name} (${s.admissionNo})`;
     container.appendChild(label);
     container.appendChild(document.createElement("br"));
   });
@@ -55,12 +54,12 @@ function renderSessions() {
     const presentIds = Array.isArray(s.presentIds) ? s.presentIds : [];
     const presentNames = presentIds.map(id => {
       const student = students.find(st => st.id === id);
-      return student ? `${student.name} (${student.regNo})` : `[Unknown ID: ${id}]`;
+      return student ? `${student.name} (${student.admissionNo})` : `[Unknown ID: ${id}]`;
     }).join(", ");
     const div = document.createElement("div");
     div.innerHTML = `
-      <h4>${s.name}</h4>
-      <p><strong>Date:</strong> ${s.date} <strong>Time:</strong> ${s.time}</p>
+      <h4>${s.name || s.topic}</h4>
+      <p><strong>Date:</strong> ${s.date} <strong>Time:</strong> ${s.time || 'N/A'}</p>
       <p><strong>Present:</strong> ${presentNames}</p>
       <button class="btn btn-sm btn-primary edit-session" data-id="${s.id}">Edit</button>
       <button class="btn btn-sm btn-danger delete-session" data-id="${s.id}">Delete</button>
@@ -69,7 +68,6 @@ function renderSessions() {
   });
 }
 
-// Initialize app
 function initializeApp() {
   fetch(STUDENTS_URL)
     .then(r => r.json())
@@ -106,13 +104,13 @@ function setupEvents() {
   studentForm.onsubmit = e => {
     e.preventDefault();
     const name = studentNameInput.value.trim();
-    const regNo = studentRegInput.value.trim();
-    if (!name || !regNo) return alert("All fields are required.");
+    const admissionNo = studentRegInput.value.trim();
+    if (!name || !admissionNo) return alert("All fields are required.");
 
     fetch(STUDENTS_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, regNo })
+      body: JSON.stringify({ name, admissionNo })
     })
       .then(res => res.json())
       .then(newStudent => {
@@ -182,9 +180,9 @@ function setupEvents() {
       const session = sessions.find(s => s.id === id);
       if (session) {
         document.getElementById("edit-session-id").value = session.id;
-        document.getElementById("edit-session-name").value = session.name;
+        document.getElementById("edit-session-name").value = session.name || session.topic || "";
         document.getElementById("edit-session-date").value = session.date;
-        document.getElementById("edit-session-time").value = session.time;
+        document.getElementById("edit-session-time").value = session.time || "";
         renderAttendanceList("edit-attendance-list", "edit-present", session.presentIds || []);
         openModal("edit-session-modal");
       }
