@@ -4,7 +4,7 @@
 
 ## Author
 
-**David Muriu**
+**David Muriu**  
 [GitHub Profile →](https://github.com/Davemuriu)
 
 ---
@@ -13,48 +13,49 @@
 
 **ClassTrack** is a student attendance tracking web application that allows users to:
 
-* Create and manage class sessions
-* Add and update students
-* Take and review attendance
-* All data is handled via asynchronous requests to a custom `json-server` backend API
+- Create and manage class sessions
+- Add and update students
+- Take and review attendance
+
+All data is handled via asynchronous requests to a live backend API powered by `json-server` deployed on **Render**.
 
 This project demonstrates:
 
-* Asynchronous JavaScript (fetch API)
-* Clean UI/UX using HTML/CSS/JS
-* Dynamic form handling
-* SPA (Single Page Application) architecture
+- Asynchronous JavaScript (fetch API)
+- Clean UI/UX using HTML/CSS/JS
+- Dynamic form handling
+- SPA (Single Page Application) architecture
 
 ---
 
 ## Live Links
 
-* **Frontend on GitHub Pages:**
+- **Frontend (GitHub Pages):**  
   [https://davemuriu.github.io/classtrack/](https://davemuriu.github.io/classtrack/)
 
-* **Backend (json-server on Render):**
+- **Backend API (Render):**  
   [https://classtrack.onrender.com/](https://classtrack.onrender.com/)
+
+> ⚠️ Make sure `main.js` uses the correct API base URL from the deployed backend.
 
 ---
 
-## Project Setup Instructions
+## Project Setup (Local Development)
 
-### Clone & Run Locally
-
-1. **Clone the repo:**
+### 1. Clone the Repo
 
 ```bash
 git clone git@github.com:Davemuriu/classtrack.git
 cd classtrack
 ```
 
-2. **Install dependencies:**
+### 2. Install Dependencies
 
 ```bash
 npm install
 ```
 
-3. **Start the JSON server:**
+### 3. Run JSON Server Locally (optional for development)
 
 ```bash
 npm start
@@ -62,30 +63,29 @@ npm start
 npx json-server --watch db.json --port 3000
 ```
 
-4. **Open `index.html` in your browser.**
+> You can now access the API at `http://localhost:3000/`
 
-> Alternatively, serve using Live Server (VS Code extension).
+### 4. Open the Frontend
+
+You can open `index.html` directly in your browser or use Live Server in VS Code.
+
+---
+
+## Deployment Notes
+
+- The backend API is deployed to **Render** using `json-server` and a simple `server.js` script.
+- The frontend is deployed to **GitHub Pages** from the `main` branch.
 
 ---
 
 ## Key Features
 
-* **SPA (Single Page Application):** All content loads within a single HTML file.
-* **Asynchronous Data Fetching:** Uses `fetch()` with JSON.
-* **Dynamic Event Listeners:** Includes at least 3 listeners (click, submit, DOMContentLoaded).
-* **Form Handling:** With clear/reset behavior after submission.
-* **Validation:** Form fields include basic checks.
-* **Clean Code:** DRY principles using reusable functions.
-
----
-
-## Visual & UX Notes
-
-* Minimal, mobile-responsive design.
-* Clear labels for all form fields.
-* Simple modal-based interfaces.
-* Buttons styled with clear, readable hierarchy.
-* Layout optimized for usability and clarity.
+- Single Page Application (SPA)
+- Fully asynchronous data fetching using `fetch`
+- Dynamic DOM updates and modals
+- Multiple event listeners: `click`, `submit`, `input`, etc.
+- Clear UX with modals and validation
+- Easily export sessions to Excel
 
 ---
 
@@ -93,14 +93,14 @@ npx json-server --watch db.json --port 3000
 
 ```
 classtrack/
-├── index.html        # Single HTML page (SPA)
-├── main.js           # JS logic with API calls + DOM updates
-├── style.css         # All UI styling
-├── db.json           # Sample student/session data
-├── server.js         # Optional entry point for Render deployment
-├── package.json      # json-server dependency
-├── README.md         # Project documentation
-└── LICENSE.md        # MIT License
+├── index.html         # Main SPA page
+├── main.js            # JavaScript logic (API + DOM)
+├── style.css          # Custom styling
+├── db.json            # Sample student/session data
+├── server.js          # JSON Server entry point for Render
+├── package.json       # Project metadata + json-server dependency
+├── README.md          # Project documentation
+└── LICENSE.md         # License
 ```
 
 ---
