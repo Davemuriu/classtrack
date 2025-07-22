@@ -47,9 +47,11 @@
     <div class="modal-content">
       <span id="close-student-modal" class="close">&times;</span>
       <h2>Add New Student</h2>
-      <input type="text" id="student-name" placeholder="Student Name"/>
-      <input type="text" id="student-reg" placeholder="Registration Number"/>
-      <button id="save-student" class="btn">Save</button>
+      <form id="student-form">
+        <input type="text" id="student-name" placeholder="Student Name" required />
+        <input type="text" id="student-reg" placeholder="Registration Number" required />
+        <button type="submit" class="btn">Save</button>
+      </form>
     </div>
   </div>
 
@@ -58,7 +60,7 @@
     <div class="modal-content">
       <span id="close-attendance-modal" class="close">&times;</span>
       <h2>Take Attendance</h2>
-      <input type="text" id="session-name" placeholder="Session Name"/>
+      <input type="text" id="session-name" placeholder="Session Name" required />
       <form id="attendance-form">
         <div id="attendance-student-list" class="checkbox-list"></div>
         <button type="submit" class="btn">Submit Attendance</button>

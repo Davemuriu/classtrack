@@ -1,4 +1,45 @@
 {
-  "students": [],
-  "sessions": []
+  "students": [
+    {
+      "id": 1,
+      "name": "Faith Wanjiku",
+      "className": "Grade 5",
+      "admissionNo": "F1024"
+    },
+    {
+      "id": 2,
+      "name": "Brian Otieno",
+      "className": "Grade 6",
+      "admissionNo": "B2045"
+    },
+    {
+      "id": 3,
+      "name": "Alice Mwangi",
+      "className": "Grade 5",
+      "admissionNo": "A3011"
+    },
+    {
+      "id": 4,
+      "name": "John Karanja",
+      "className": "Grade 7",
+      "admissionNo": "J7762"
+    }
+  ],
+  "sessions": [
+    {
+      "id": 1,
+      "date": "2025-07-01",
+      "topic": "Math - Fractions"
+    },
+    {
+      "id": 2,
+      "date": "2025-07-03",
+      "topic": "Science - States of Matter"
+    },
+    {
+      "id": 3,
+      "date": "2025-07-05",
+      "topic": "English - Composition Writing"
+    }
+  ]
 }

@@ -40,7 +40,7 @@ function renderAttendanceList(containerId, nameAttr, presentIds = []) {
     const checked = presentIds.includes(s.id) ? "checked" : "";
     const label = document.createElement("label");
     label.innerHTML = `
-      <input type="checkbox" name="${nameAttr}" value="${s.id}" ${checked}> 
+      <input type="checkbox" name="${nameAttr}" value="${s.id}" ${checked}>
       ${s.name} (${s.regNo})`;
     container.appendChild(label);
     container.appendChild(document.createElement("br"));
@@ -67,134 +67,178 @@ function renderSessions() {
   });
 }
 
-function fetchData() {
-  fetch(STUDENTS_URL).then(r => r.json()).then(data => {
-    students = data;
-    renderStudentList();
-    renderAttendanceList("attendance-student-list", "present");
-    updateStats();
-  });
-
-  fetch(SESSIONS_URL).then(r => r.json()).then(data => {
-    sessions = data;
-    renderSessions();
-    updateStats();
-  });
-}
-
-document.getElementById("save-student").onclick = () => {
-  const name = document.getElementById("student-name").value.trim();
-  const regNo = document.getElementById("student-reg").value.trim();
-  if (!name || !regNo) return alert("All fields required");
-
-  fetch(STUDENTS_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name, regNo })
-  }).then(res => res.json()).then(newStudent => {
-    students.push(newStudent);
-    renderStudentList();
-    renderAttendanceList("attendance-student-list", "present");
-    updateStats();
-    closeModal("student-modal");
-  });
-};
-
-document.getElementById("student-list").addEventListener("click", e => {
-  if (e.target.classList.contains("delete-student")) {
-    const id = e.target.dataset.id;
-    fetch(`${STUDENTS_URL}/${id}`, { method: "DELETE" }).then(() => {
-      students = students.filter(s => s.id != id);
+// Initialize app
+function initializeApp() {
+  fetch(STUDENTS_URL)
+    .then(r => r.json())
+    .then(data => {
+      students = data;
       renderStudentList();
       renderAttendanceList("attendance-student-list", "present");
       updateStats();
-    });
-  }
-});
-
-document.getElementById("attendance-form").onsubmit = e => {
-  e.preventDefault();
-  const name = document.getElementById("session-name").value.trim();
-  const presentIds = Array.from(document.querySelectorAll("input[name='present']:checked")).map(cb => +cb.value);
-  const now = new Date();
-  const session = {
-    name,
-    date: now.toISOString().split("T")[0],
-    time: now.toTimeString().split(" ")[0],
-    presentIds
-  };
-  fetch(SESSIONS_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(session)
-  }).then(r => r.json()).then(newSession => {
-    sessions.push(newSession);
-    renderSessions();
-    updateStats();
-    closeModal("attendance-modal");
-  });
-};
-
-document.getElementById("sessions-list").addEventListener("click", e => {
-  const id = e.target.dataset.id ? parseInt(e.target.dataset.id) : null;
-  if (!id || isNaN(id)) return alert("Invalid session ID.");
-
-  if (e.target.classList.contains("delete-session")) {
-    fetch(`${SESSIONS_URL}/${id}`, { method: "DELETE" }).then(res => {
-      if (!res.ok) {
-        alert(`Session ${id} not found`);
-        return;
-      }
-      sessions = sessions.filter(s => s.id !== id);
+    })
+    .then(() => fetch(SESSIONS_URL))
+    .then(r => r.json())
+    .then(data => {
+      sessions = data;
       renderSessions();
       updateStats();
-    });
-  } else if (e.target.classList.contains("edit-session")) {
-    const session = sessions.find(s => s.id === id);
-    if (session) {
-      document.getElementById("edit-session-id").value = session.id;
-      document.getElementById("edit-session-name").value = session.name;
-      document.getElementById("edit-session-date").value = session.date;
-      document.getElementById("edit-session-time").value = session.time;
-      renderAttendanceList("edit-attendance-list", "edit-present", session.presentIds);
-      openModal("edit-session-modal");
+    })
+    .then(() => setupEvents());
+}
+
+function setupEvents() {
+  const studentNameInput = document.getElementById("student-name");
+  const studentRegInput = document.getElementById("student-reg");
+  const studentForm = document.getElementById("student-form");
+  const attendanceForm = document.getElementById("attendance-form");
+
+  // Input validation: real-time
+  studentNameInput.addEventListener("input", () => {
+    if (!studentNameInput.value.trim()) {
+      studentNameInput.style.borderColor = "red";
+    } else {
+      studentNameInput.style.borderColor = "";
     }
-  }
-});
-
-document.getElementById("update-session").onclick = () => {
-  const id = +document.getElementById("edit-session-id").value;
-  const name = document.getElementById("edit-session-name").value.trim();
-  const date = document.getElementById("edit-session-date").value;
-  const time = document.getElementById("edit-session-time").value;
-  const presentIds = Array.from(document.querySelectorAll("input[name='edit-present']:checked")).map(cb => +cb.value);
-
-  if (!name || !date || !time) return alert("All fields required");
-
-  const updatedSession = { id, name, date, time, presentIds };
-  fetch(`${SESSIONS_URL}/${id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(updatedSession)
-  }).then(r => r.json()).then(updated => {
-    const index = sessions.findIndex(s => s.id === updated.id);
-    sessions[index] = updated;
-    renderSessions();
-    updateStats();
-    closeModal("edit-session-modal");
   });
-};
 
-document.getElementById("view-sessions-btn").onclick = () => {
-  renderSessions();
-  openModal("sessions-modal");
-};
+  studentRegInput.addEventListener("input", () => {
+    if (!studentRegInput.value.trim()) {
+      studentRegInput.style.borderColor = "red";
+    } else {
+      studentRegInput.style.borderColor = "";
+    }
+  });
 
-document.getElementById("add-student-btn").onclick = () => openModal("student-modal");
-document.getElementById("take-attendance-btn").onclick = () => openModal("attendance-modal");
-document.getElementById("close-student-modal").onclick = () => closeModal("student-modal");
-document.getElementById("close-attendance-modal").onclick = () => closeModal("attendance-modal");
-document.getElementById("close-sessions-modal").onclick = () => closeModal("sessions-modal");
-document.getElementById("close-edit-session-modal").onclick = () => closeModal("edit-session-modal");
+  // Submit student
+  studentForm.onsubmit = e => {
+    e.preventDefault();
+    const name = studentNameInput.value.trim();
+    const regNo = studentRegInput.value.trim();
+    if (!name || !regNo) return alert("All fields are required.");
 
-fetchData();
+    fetch(STUDENTS_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, regNo })
+    })
+      .then(res => res.json())
+      .then(newStudent => {
+        students.push(newStudent);
+        renderStudentList();
+        renderAttendanceList("attendance-student-list", "present");
+        updateStats();
+        closeModal("student-modal");
+        studentForm.reset();
+      });
+  };
+
+  // Delete student with confirm
+  document.getElementById("student-list").addEventListener("click", e => {
+    if (e.target.classList.contains("delete-student")) {
+      const id = e.target.dataset.id;
+      if (confirm("Are you sure you want to delete this student?")) {
+        fetch(`${STUDENTS_URL}/${id}`, { method: "DELETE" }).then(() => {
+          students = students.filter(s => s.id != id);
+          renderStudentList();
+          renderAttendanceList("attendance-student-list", "present");
+          updateStats();
+        });
+      }
+    }
+  });
+
+  // Submit session
+  attendanceForm.onsubmit = e => {
+    e.preventDefault();
+    const name = document.getElementById("session-name").value.trim();
+    const presentIds = Array.from(document.querySelectorAll("input[name='present']:checked")).map(cb => +cb.value);
+    const now = new Date();
+    const session = {
+      name,
+      date: now.toISOString().split("T")[0],
+      time: now.toTimeString().split(" ")[0],
+      presentIds
+    };
+
+    fetch(SESSIONS_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(session)
+    })
+      .then(r => r.json())
+      .then(newSession => {
+        sessions.push(newSession);
+        renderSessions();
+        updateStats();
+        closeModal("attendance-modal");
+        attendanceForm.reset();
+      });
+  };
+
+  // Delete or Edit session
+  document.getElementById("sessions-list").addEventListener("click", e => {
+    const id = parseInt(e.target.dataset.id);
+    if (!id) return;
+
+    if (e.target.classList.contains("delete-session")) {
+      if (confirm("Are you sure you want to delete this session?")) {
+        fetch(`${SESSIONS_URL}/${id}`, { method: "DELETE" }).then(() => {
+          sessions = sessions.filter(s => s.id !== id);
+          renderSessions();
+          updateStats();
+        });
+      }
+    } else if (e.target.classList.contains("edit-session")) {
+      const session = sessions.find(s => s.id === id);
+      if (session) {
+        document.getElementById("edit-session-id").value = session.id;
+        document.getElementById("edit-session-name").value = session.name;
+        document.getElementById("edit-session-date").value = session.date;
+        document.getElementById("edit-session-time").value = session.time;
+        renderAttendanceList("edit-attendance-list", "edit-present", session.presentIds);
+        openModal("edit-session-modal");
+      }
+    }
+  });
+
+  // Update session
+  document.getElementById("update-session").onclick = () => {
+    const id = +document.getElementById("edit-session-id").value;
+    const name = document.getElementById("edit-session-name").value.trim();
+    const date = document.getElementById("edit-session-date").value;
+    const time = document.getElementById("edit-session-time").value;
+    const presentIds = Array.from(document.querySelectorAll("input[name='edit-present']:checked")).map(cb => +cb.value);
+
+    if (!name || !date || !time) return alert("All fields required");
+
+    const updatedSession = { id, name, date, time, presentIds };
+    fetch(`${SESSIONS_URL}/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updatedSession)
+    }).then(r => r.json()).then(updated => {
+      const index = sessions.findIndex(s => s.id === updated.id);
+      sessions[index] = updated;
+      renderSessions();
+      updateStats();
+      closeModal("edit-session-modal");
+    });
+  };
+
+  // Modal triggers
+  document.getElementById("add-student-btn").onclick = () => openModal("student-modal");
+  document.getElementById("take-attendance-btn").onclick = () => openModal("attendance-modal");
+  document.getElementById("view-sessions-btn").onclick = () => {
+    renderSessions();
+    openModal("sessions-modal");
+  };
+
+  // Modal closers
+  document.getElementById("close-student-modal").onclick = () => closeModal("student-modal");
+  document.getElementById("close-attendance-modal").onclick = () => closeModal("attendance-modal");
+  document.getElementById("close-sessions-modal").onclick = () => closeModal("sessions-modal");
+  document.getElementById("close-edit-session-modal").onclick = () => closeModal("edit-session-modal");
+}
+
+initializeApp();
